@@ -1,4 +1,7 @@
 import React from 'react';
+import { Image } from 'react-native';
+import { Dimensions } from 'react-native';
+import { Pressable } from 'react-native';
 import {
   View,
   StyleSheet,
@@ -8,6 +11,7 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import color from '../misc/color';
+import Player from '../screens/Player';
 
 const OptionModal = ({
   visible,
@@ -21,65 +25,25 @@ const OptionModal = ({
   return (
     <>
       <StatusBar hidden />
-      <Modal animationType='slide' transparent visible={visible}>
-        <View style={styles.modal}>
-          <Text style={styles.title} numberOfLines={2}>
-            {filename}
-          </Text>
-          <View style={styles.optionContainer}>
-            {options.map(optn => {
-              return (
-                <TouchableWithoutFeedback
-                  key={optn.title}
-                  onPress={optn.onPress}
-                >
-                  <Text style={styles.option}>{optn.title}</Text>
-                </TouchableWithoutFeedback>
-              );
-            })}
-            {/* <TouchableWithoutFeedback onPress={onPlayPress}>
-              <Text style={styles.option}>Play</Text>
-            </TouchableWithoutFeedback>
-            <TouchableWithoutFeedback onPress={onPlayListPress}>
-              <Text style={styles.option}>Add to Playlist</Text>
-            </TouchableWithoutFeedback> */}
+        {/*<Pressable visible={visible} onPress={onClose}>*/}
+        <Modal animationType='slide' transparent visible={visible}>
+          <View style={[styles.widgetContainerControl]}>
+                  <Player onPress={onClose}/>
           </View>
-        </View>
-        <TouchableWithoutFeedback onPress={onClose}>
-          <View style={styles.modalBg} />
-        </TouchableWithoutFeedback>
-      </Modal>
+          </Modal>
+        {/*</Pressable>*/}
     </>
   );
 };
 
 const styles = StyleSheet.create({
-  modal: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    left: 0,
-    backgroundColor: color.APP_BG,
-    borderTopRightRadius: 20,
-    borderTopLeftRadius: 20,
-    zIndex: 1000,
-  },
-  optionContainer: {
-    padding: 20,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    padding: 20,
-    paddingBottom: 0,
-    color: color.FONT_MEDIUM,
-  },
-  option: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: color.FONT,
-    paddingVertical: 10,
-    letterSpacing: 1,
+  widgetArtisteTitle: {
+    fontSize: 14,
+    color: '#fff',
+    opacity: 0.8,
+    marginHorizontal: 10,
+    marginBottom: 12,
+    marginTop: 1,
   },
   modalBg: {
     position: 'absolute',
@@ -87,8 +51,29 @@ const styles = StyleSheet.create({
     right: 0,
     left: 0,
     bottom: 0,
-    backgroundColor: color.MODAL_BG,
+    //backgroundColor: color.MODAL_BG,
   },
+  widgetContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    justifyContent:'flex-end',
+    paddingHorizontal: 0,
+    height: 60,
+    width: Dimensions.get("window").width,
+    backgroundColor: 'red',
+  },
+  widgetContainerControl: {
+    //flexDirection: 'row',
+    //alignItems: 'center',
+    alignItems:'flex-end',
+    paddingHorizontal: 0,
+    height: 150,
+    top:"82.2%",
+    width: Dimensions.get("window").width,
+    backgroundColor: 'blue',
+  },
+  
 });
 
 export default OptionModal;

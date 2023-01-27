@@ -1,4 +1,4 @@
-import React, { Component, createContext } from 'react';
+import React, { Component, createContext,useEffect } from 'react';
 import { Text, View, Alert } from 'react-native';
 import * as MediaLibrary from 'expo-media-library';
 import { DataProvider } from 'recyclerlistview';
@@ -6,8 +6,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Audio } from 'expo-av';
 import { storeAudioForNextOpening } from '../misc/helper';
 import { playNext } from '../misc/audioController';
+import { musiclibrary } from '../components/data/data';
 export const AudioContext = createContext();
+
 export class AudioProvider extends Component {
+  
   constructor(props) {
     super(props);
     this.state = {
@@ -42,9 +45,11 @@ export class AudioProvider extends Component {
     ]);
   };
 
+
+
   getAudioFiles = async () => {
     const { dataProvider, audioFiles } = this.state;
-    let media = await MediaLibrary.getAssetsAsync({
+    /*let media = await MediaLibrary.getAssetsAsync({
       mediaType: 'audio',
     });
     media = await MediaLibrary.getAssetsAsync({
@@ -60,6 +65,17 @@ export class AudioProvider extends Component {
         ...media.assets,
       ]),
       audioFiles: [...audioFiles, ...media.assets],
+    });*/
+    let media = musiclibrary;
+    this.totalAudioCount = media.length;
+
+    this.setState({
+      ...this.state,
+      dataProvider: dataProvider.cloneWithRows([
+        ...audioFiles,
+        ...media,
+      ]),
+      audioFiles: [...audioFiles, ...media],
     });
   };
 
@@ -148,7 +164,7 @@ export class AudioProvider extends Component {
           ({ id }) => id === audio.id
         );
 
-        const status = await playNext(this.state.playbackObj, audio.uri);
+        const status = await playNext(this.state.playbackObj, audio.url);
         return this.updateState(this, {
           soundObj: status,
           isPlaying: true,
@@ -173,7 +189,7 @@ export class AudioProvider extends Component {
       }
       // otherwise we want to select the next audio
       const audio = this.state.audioFiles[nextAudioIndex];
-      const status = await playNext(this.state.playbackObj, audio.uri);
+      const status = await playNext(this.state.playbackObj, audio.url);
       this.updateState(this, {
         soundObj: status,
         currentAudio: audio,
@@ -186,11 +202,13 @@ export class AudioProvider extends Component {
 
   componentDidMount() {
     this.getPermission();
+    //this.getAudioFiles();
     if (this.state.playbackObj === null) {
       this.setState({ ...this.state, playbackObj: new Audio.Sound() });
     }
   }
 
+  
   updateState = (prevState, newState = {}) => {
     this.setState({ ...prevState, ...newState });
   };

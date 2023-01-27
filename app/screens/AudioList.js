@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component,useState } from 'react';
 import { Text, View, StyleSheet, ScrollView, Dimensions } from 'react-native';
 import { AudioContext } from '../context/AudioProvider';
 import { RecyclerListView, LayoutProvider } from 'recyclerlistview';
@@ -14,10 +14,10 @@ import {
   selectAudio,
 } from '../misc/audioController';
 import { storeAudioForNextOpening } from '../misc/helper';
+import { useWindowDimensions } from 'react-native';
 
 export class AudioList extends Component {
   static contextType = AudioContext;
-
   constructor(props) {
     super(props);
     this.state = {
@@ -51,9 +51,10 @@ export class AudioList extends Component {
   }
 
   rowRenderer = (type, item, index, extendedState) => {
+    //console.log("DATOS DE ITEM:   ",item)
     return (
       <AudioListItem
-        title={item.filename}
+        title={item.title}
         isPlaying={extendedState.isPlaying}
         activeListItem={this.context.currentAudioIndex === index}
         duration={item.duration}
@@ -79,7 +80,7 @@ export class AudioList extends Component {
         {({ dataProvider, isPlaying }) => {
           if (!dataProvider._data.length) return null;
           return (
-            <Screen>
+            <Screen rowRenderer={dataProvider}>
               <RecyclerListView
                 dataProvider={dataProvider}
                 layoutProvider={this.layoutProvider}
@@ -87,12 +88,6 @@ export class AudioList extends Component {
                 extendedState={{ isPlaying }}
               />
               <OptionModal
-                options={[
-                  {
-                    title: 'Add to playlist',
-                    onPress: this.navigateToPlaylist,
-                  },
-                ]}
                 currentItem={this.currentItem}
                 onClose={() =>
                   this.setState({ ...this.state, optionModalVisible: false })
@@ -112,7 +107,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor:"blue"
   },
+  
 });
 
 export default AudioList;

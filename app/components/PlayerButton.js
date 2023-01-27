@@ -1,22 +1,37 @@
 import React from 'react';
 import { AntDesign } from '@expo/vector-icons';
 import color from '../misc/color';
+import { Image } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 
-const PlayerButton = props => {
-  const { iconType, size = 40, iconColor = color.FONT, onPress } = props;
-  const getIconName = type => {
-    switch (type) {
+ export const PlayerButton = ({variation,onPress}) => {
+
+  const PAUSE = require('../../assets/icon/pause.png');
+  const PLAY = require('../../assets/icon/play.png');
+  const NEXT = require('../../assets/icon/next.png');
+  const PREV = require('../../assets/icon/prev.png');
+  //const { iconType, size = 40, iconColor = color.FONT, onPress } = props;
+
+    switch (variation) {
       case 'PLAY':
-        return 'pausecircle';
+        return <TouchableOpacity onPress={onPress}>
+                 <Image source={PLAY} style={{width:30,height:30,marginHorizontal:5}}/>
+               </TouchableOpacity>;
       case 'PAUSE':
-        return 'playcircleo';
+        return <TouchableOpacity onPress={onPress}>
+                  <Image source={PAUSE} style={{width:30,height:30,marginHorizontal:5}}/>
+                </TouchableOpacity>;
       case 'NEXT':
-        return 'forward';
+        return <TouchableOpacity onPress={onPress}>
+                <Image source={NEXT} style={{width:25,height:25,marginHorizontal:5}}/>
+                </TouchableOpacity>;
       case 'PREV':
-        return 'banckward';
-    }
+        return <TouchableOpacity onPress={onPress}>
+                <Image source={PREV} style={{width:25,height:25,marginHorizontal:5}}/>
+                </TouchableOpacity>;
+    
   };
-  return (
+  /*return (
     <AntDesign
       {...props}
       onPress={onPress}
@@ -24,7 +39,7 @@ const PlayerButton = props => {
       size={size}
       color={iconColor}
     />
-  );
+  );*/
 };
 
 export default PlayerButton;

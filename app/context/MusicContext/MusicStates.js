@@ -1,4 +1,4 @@
-import { useReducer, useMemo } from "react";
+import { useReducer, useMemo, useState } from "react";
 import MusicContext from "./MusicContext";
 import { MusicReducer } from "./MusicReducer";
 import { HANDLE_CONTROLLER_MUSIC, HANDLE_CURRENT_MUSIC, HANDLE_IS_PLAYING, HANDLE_LISTNER, HANDLE_ON_SLIDING_CHANGE, LOAD_MUSICS } from "./MusicTypes";
@@ -18,7 +18,7 @@ export const MusicStates = ({ children }) => {
       sliderVale: 0,
       sliderValeMax: 1,
       currentSong: null,
-      onSlidingChange:false
+      onSlidingChange: false
     }),
     []
   );
@@ -30,11 +30,17 @@ export const MusicStates = ({ children }) => {
   );
 
   const [state, dispatch] = useReducer(MusicReducer, initialState);
+  const [isValueAudioPlayer, setIsValueAudioPlayer] = useState(true);
+ 
   const [stateListner, dispatchListener] = useReducer(ListenerReducer, initialStateListener);
   let audioPlayer = useRef(null)
   let isPlayingInside = useRef(true);
   let indexMusic = useRef(0);
   let onSlidingChange = useRef(false);
+  let sliderValueContext = useRef(0);
+  let sliderValueLast = useRef(0);
+  let onSliderValueChandleInside = useRef(true);
+
 
   useEffect(() => {
     if (!stateListner.isListener) {
@@ -42,6 +48,18 @@ export const MusicStates = ({ children }) => {
       dispatchListener({ type: HANDLE_LISTNER, payload: true })
     }
   }, [stateListner])
+
+  const getSliderValue = () => {
+   
+    if (
+      onSliderValueChandleInside.current
+    ) {
+      return sliderValueContext.current;
+    } else {
+      return sliderValueLast.current;
+    }
+
+  }
 
   const playSound = (music) => {
 
@@ -91,10 +109,10 @@ export const MusicStates = ({ children }) => {
   }
   const initAudioListener = () => {
     onProgressMusic();
-    setTimeout(initAudioListener, 100)
+    setTimeout(initAudioListener, 1000)
   }
   const onProgressMusic = () => {
-    if (audioPlayer.current && isPlayingInside.current&&!state.onSlidingChange) {
+    if (audioPlayer.current && isPlayingInside.current && !state.onSlidingChange) {
 
       audioPlayer.current.getCurrentTime((seconds) => {
         let time = calculateTime(seconds)
@@ -103,9 +121,12 @@ export const MusicStates = ({ children }) => {
         controllerMusic({
           currentTime: time,
           musicDuration: timeDuration.includes("-") ? "00:00" : timeDuration,
-          sliderVale: sliderValue,
           sliderValeMax: 1
         })
+
+        sliderValueContext.current = sliderValue
+
+
 
 
       })
@@ -157,42 +178,40 @@ export const MusicStates = ({ children }) => {
     try {
       isPlayingInside.current = false;
       audioPlayer.current.pause();
-      dispatch({type:HANDLE_ON_SLIDING_CHANGE,payload: true})
-      
+      onSlidingChange.current = true;
+      onSliderValueChandleInside.current = false
+
     } catch (error) {
       console.log("ERROR EN REPRODUCTOR DE CANCIONES BARRA INICIO----", error)
     }
   }
   const onValueChangeSliderContext = (values) => {
-    console.log("cambiando valoir de slieder", values)
-    if (audioPlayer.current&& state.onSlidingChange) {
-      let value=values * audioPlayer.current.getDuration();
+    sliderValueLast.current = values;
+    if (audioPlayer.current && onSlidingChange.current) {
 
-      let time = 0;
-      audioPlayer.current.setCurrentTime(value)
-      audioPlayer.current.getCurrentTime((seconds) => {
-        time = calculateTime(seconds)
-      })
+      sliderValueContext.current = values;
 
-      controllerMusic({
-        currentTime: time,
-        sliderVale: value,
-        sliderValeMax: 1
-      })
+      console.log("cambiando valoir de slieder", sliderValueContext.current)
+      audioPlayer.current.setCurrentTime(values * audioPlayer.current.getDuration())
       audioPlayer.current.play();
       isPlayingInside.current = true;
-      dispatch({type:HANDLE_ON_SLIDING_CHANGE,payload: false})
-      
+      onSlidingChange.current = false;
+      const loadValue=()=>{
+        onSliderValueChandleInside.current = true
+      }
+      setTimeout(loadValue,2000)
+   
     }
+    
   }
   const onSlidingCompleteContext = (value) => {
     console.log("cambiando valoir de slieder complete", value)
     if (audioPlayer.current) {
       audioPlayer.current.setCurrentTime(value)
       audioPlayer.current.play();
-      controllerMusic({
+      /*controllerMusic({
         sliderVale: value,
-      })
+      })*/
     }
   }
 
@@ -204,6 +223,7 @@ export const MusicStates = ({ children }) => {
       sliderVale: state.sliderVale,
       sliderValeMax: state.sliderValeMax,
       currentSong: state.currentSong,
+      getSliderValue,
       playSound,
       loadSounds,
       onPlayPause,

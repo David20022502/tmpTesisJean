@@ -36,9 +36,12 @@ const TrackListScreen = ({ musiclibrary }) => {
   const [playbackPosition, setPlaybackPosition] = useState(null)
   const [playbackDuration, setPlaybackDuration] = useState(null)
   const [verificator, setVerificator] = useState(false)
-//const [currentSong, setCurrentSong] = useState({})
+  const [isChanging, setisChanging] = useState(true);
+  //const [currentSong, setCurrentSong] = useState({})
   const [currentPosition, setCurrentPosition] = useState(0);
-  const {currentSong,onSlidingCompleteContext,onValueChangeSliderContext,onSlidingStartContect, onPrevMusic, onNextMusic, loadSounds, playSound, currentTime, musicDuration, onPlayPause, isPlaying, sliderVale, sliderValeMax } = useContext(MusicContext);
+
+  const [tempV,setTempV]=useState(0)
+  const { currentSong, getSliderValue, onSlidingCompleteContext, onValueChangeSliderContext, onSlidingStartContect, onPrevMusic, onNextMusic, loadSounds, playSound, currentTime, musicDuration, onPlayPause, isPlaying, sliderVale, sliderValeMax } = useContext(MusicContext);
 
   useEffect(() => {
     //console.log("loadSounds------",loadSounds)
@@ -347,13 +350,14 @@ const TrackListScreen = ({ musiclibrary }) => {
                   <View>
                     <Text style={styles.widgetMusicTitle}>
                       {currentSong.tema}
+                     
                     </Text>
                     <View style={styles.progressBar}>
                       <Text style={styles.mainText}>{currentTime}</Text>
+                      {console.log("vcalor de slider", getSliderValue())}
                       <Slider
                         style={{ width: '70%', height: 20 }}
-                        
-                        value={sliderVale}
+                        value={getSliderValue()}
                         minimumTrackTintColor="#FFFFFF"
                         maximumTrackTintColor="gray"
                         thumbTintColor='#FFFFFF'
@@ -361,10 +365,12 @@ const TrackListScreen = ({ musiclibrary }) => {
                         minimumValue={0}
                         onValueChange={value => {
                           onValueChangeSliderContext(value)
+                          
                         }}
-                        maximumValue={sliderValeMax}
-                        onSlidingComplete={(e)=>{onSlidingCompleteContext}}
+                        maximumValue={1}
+
                       />
+                    
                       <Text style={styles.mainText}>{musicDuration}</Text>
                     </View>
                   </View>
@@ -381,7 +387,7 @@ const TrackListScreen = ({ musiclibrary }) => {
                         style={{ height: 30, tintColor: '#fff', width: 30 }}
                       />
                     </Pressable>
-                    <Pressable onPress={ onNextMusic}>
+                    <Pressable onPress={onNextMusic}>
                       <Image
                         source={require('../../assets/icon/next.png')}
                         style={{ height: 25, tintColor: '#fff', width: 25 }}

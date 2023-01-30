@@ -42,7 +42,6 @@ export const MusicReducer = (state, action) => {
                 ...{
                     currentTime:payload.currentTime?payload.currentTime:state.currentTime,
                     musicDuration:payload.musicDuration?payload.musicDuration:state.musicDuration,
-                    sliderVale:payload.sliderVale?payload.sliderVale:state.sliderVale,
                     sliderValeMax:payload.sliderValeMax?payload.sliderValeMax:state.sliderValeMax
                 }
                
